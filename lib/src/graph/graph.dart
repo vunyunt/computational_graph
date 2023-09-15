@@ -10,5 +10,4 @@ part 'edge.dart';
 class Graph {
   Node? root;
   final Set<Node> nodes = {};
-
 }

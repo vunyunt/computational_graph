@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message Graph {
+  string serializerVersion = 1;
+  string root = 2;
+  repeated Node nodes = 3;
+}
+
+message Node {
+  string type = 1;
+  string id = 2;
+  repeated string inPorts = 3;
+  repeated string outPorts = 4;
+}
+
+message Edge {
+  string from = 1;
+  string to = 2;
+}
