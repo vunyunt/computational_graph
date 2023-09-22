@@ -1,0 +1,112 @@
+import 'dart:collection';
+
+import 'package:computational_graph/src/graph/graph.dart';
+import 'package:computational_graph/src/serialization/node_factory_registry.dart';
+import 'package:computational_graph/src/serialization/protobuf/models/graph.pb.dart';
+import 'package:computational_graph/src/serialization/serializer.dart';
+import 'package:protobuf/protobuf.dart';
+
+class UnknownNodeTypeException implements Exception {
+  String message;
+
+  UnknownNodeTypeException(this.message);
+}
+
+class UnknownNodeException implements Exception {}
+
+class UnknownPortException implements Exception {}
+
+class ProtobufSerializer implements Serializer<GeneratedMessage> {
+  static const version = 1;
+
+  final NodeFactoryRegistry<GeneratedMessage> registry = NodeFactoryRegistry();
+
+  void registerFactoryFor(String nodeType, NodeFactory factory) {
+    registry.registerFactoryFor(nodeType, factory);
+  }
+
+  EdgeProto serializeEdge(Edge edge) {
+    return EdgeProto()
+      ..fromNodeId = edge.from.node.id
+      ..fromPortName = edge.from.name
+      ..toNodeId = edge.to.node.id
+      ..toPortName = edge.to.name;
+  }
+
+  Iterable<Edge> getAllEdges(Graph graph) {
+    Set<Edge> edges = HashSet();
+
+    for (final entry in graph.nodes.entries) {
+      for (final portEntry in entry.value.inPorts.entries) {
+        if (portEntry.value.edge != null) {
+          edges.add(portEntry.value.edge!);
+        }
+      }
+    }
+
+    return edges;
+  }
+
+  @override
+  GraphProto serializeGraph(Graph graph) {
+    final edges = getAllEdges(graph);
+
+    GraphProto serialized = GraphProto()
+      ..serializerVersion = version
+      ..nodes.addAll(
+          graph.nodes.entries.map((entry) => serializeNode(entry.value)))
+      ..edges.addAll(edges.map((edge) => serializeEdge(edge)));
+
+    return serialized;
+  }
+
+  NodeProto serializeNode(Node node) {
+    return NodeProto()
+      ..type = node.typeName
+      ..id = node.id;
+  }
+
+  @override
+  Graph deserializeGraph(GeneratedMessage serializedGraph, Graph? graph) {
+    GraphProto graphProto = serializedGraph as GraphProto;
+    graph ??= Graph();
+
+    for (final nodeProto in graphProto.nodes) {
+      deserializeNode(graph, nodeProto);
+    }
+
+    for (final edgeProto in graphProto.edges) {
+      deserializeEdge(graph, edgeProto);
+    }
+
+    return graph;
+  }
+
+  Node deserializeNode(Graph graph, NodeProto serializedNode) {
+    final factory = registry.getFactoryFor(serializedNode.type);
+    if (factory == null) {
+      throw UnknownNodeTypeException(
+          "Node factory for type ${serializedNode.type} not found");
+    }
+
+    return factory(graph, id: serializedNode.id);
+  }
+
+  Edge deserializeEdge(Graph graph, EdgeProto serializedEdge) {
+    Node? fromNode = graph.nodes[serializedEdge.fromNodeId];
+    Node? toNode = graph.nodes[serializedEdge.toNodeId];
+
+    if (fromNode == null || toNode == null) {
+      throw UnknownNodeException();
+    }
+
+    OutPort? fromPort = fromNode.outPorts[serializedEdge.fromPortName];
+    InPort? toPort = toNode.inPorts[serializedEdge.toPortName];
+
+    if (fromPort == null || toPort == null) {
+      throw UnknownPortException();
+    }
+
+    return fromPort.connectTo(toPort);
+  }
+}

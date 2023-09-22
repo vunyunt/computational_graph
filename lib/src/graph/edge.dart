@@ -3,17 +3,10 @@ part of './graph.dart';
 class Edge<T> {
   final OutPort<T> from;
   final InPort<T> to;
-  late final StreamSubscription<T> subscription;
 
-  Edge(this.from, this.to) {
-    subscription = from.stream.listen(to.onData);
-
-    from._connectTo(this);
-    to._connectTo(this);
-  }
+  Edge._create(this.from, this.to);
 
   void disconnect() {
-    subscription.cancel();
     from._disconnect(this);
     to._disconnect();
   }

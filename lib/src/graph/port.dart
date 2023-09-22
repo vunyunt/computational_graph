@@ -1,44 +1,77 @@
 part of './graph.dart';
 
+class PortStateError extends Error {
+  String message;
+
+  PortStateError({this.message = ""});
+}
+
 abstract class Port<DataType> {
   final Node node;
 
-  Port(this.node);
+  /// Name of the port. This should be unique within the same node.
+  final String name;
+
+  bool get isOpen;
+
+  Port({required this.node, required this.name});
 }
 
 class InPort<T> extends Port<T> {
   Edge<T>? _edge;
-  bool connected() => _edge != null;
-  late final Function(T) onData;
+  bool get connected => _edge != null;
+  Edge<T>? get edge => _edge;
+  StreamController<T>? _currentDataStream;
+  final Function(Stream<T>) onDataStreamAvailable;
 
-  InPort(super.node, this.onData);
+  @override
+  bool get isOpen =>
+      _currentDataStream != null && !_currentDataStream!.isClosed;
 
-  Edge<T> connectTo(OutPort<T> other) {
-    return Edge<T>(other, this);
-  }
+  InPort(
+      {required super.node,
+      required super.name,
+      required this.onDataStreamAvailable});
 
   void _connectTo(Edge<T> edge) {
     _edge = edge;
   }
 
-  void disconnect() {
-    _edge?.disconnect();
-  }
-
   void _disconnect() {
     _edge = null;
+  }
+
+  void _receive(T value) {
+    if (_currentDataStream == null) {
+      throw PortStateError(message: "A Closed InPort received a value.");
+    }
+
+    if (_currentDataStream!.hasListener) {
+      _currentDataStream!.add(value);
+    }
+  }
+
+  void _open() {
+    _currentDataStream = StreamController();
+    onDataStreamAvailable(_currentDataStream!.stream);
+  }
+
+  void _close() {
+    _currentDataStream?.close();
+    _currentDataStream = null;
   }
 }
 
 class OutPort<T> extends Port<T> {
   final Set<Edge<T>> _edges = {};
   late final UnmodifiableSetView<Edge<T>> edges;
-  final StreamController<T> _streamController = StreamController.broadcast();
-  late final Stream<T> stream;
+  bool _isOpen = false;
+  
+  @override
+  bool get isOpen => _isOpen;
 
-  OutPort(super.node) {
+  OutPort({required super.node, required super.name}) {
     edges = UnmodifiableSetView(_edges);
-    stream = _streamController.stream;
   }
 
   void _disconnect(Edge<T> edge) {
@@ -46,18 +79,39 @@ class OutPort<T> extends Port<T> {
   }
 
   Edge<T> connectTo(InPort<T> other) {
-    return Edge<T>(this, other);
-  }
+    var edge = Edge<T>._create(this, other);
+    edge.to._connectTo(edge);
 
-  void _connectTo(Edge<T> edge) {
+    if (_isOpen) {
+      edge.to._open();
+    }
+
     _edges.add(edge);
+
+    return edge;
   }
 
   void _send(T value) {
-    if (_streamController.hasListener) {
-      _streamController.add(value);
+    for (var edge in _edges) {
+      edge.to._receive(value);
     }
   }
 
-  bool connected() => _edges.isNotEmpty && _streamController.hasListener;
+  bool connected() => _edges.isNotEmpty;
+
+  void _close() {
+    _isOpen = false;
+
+    for (var edge in _edges) {
+      edge.to._close();
+    }
+  }
+
+  void _open() {
+    _isOpen = true;
+
+    for (var edge in _edges) {
+      edge.to._open();
+    }
+  }
 }
