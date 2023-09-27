@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:computational_graph/src/graph/graph.dart';
 import 'package:computational_graph/src/serialization/node_factory_registry.dart';
@@ -63,7 +64,11 @@ class ProtobufSerializer implements Serializer<GeneratedMessage> {
   NodeProto serializeNode(Node node) {
     return NodeProto()
       ..type = node.typeName
-      ..id = node.id;
+      ..id = node.id
+      ..attributes.addAll(node
+          .getAttributes()
+          .entries
+          .map((e) => AttributeEntry(key: e.key, value: e.value)));
   }
 
   @override
@@ -89,7 +94,12 @@ class ProtobufSerializer implements Serializer<GeneratedMessage> {
           "Node factory for type ${serializedNode.type} not found");
     }
 
-    return factory(graph, id: serializedNode.id);
+    Map<String, Uint8List> attributes = {};
+    for (final entry in serializedNode.attributes) {
+      attributes[entry.key] = Uint8List.fromList(entry.value);
+    }
+
+    return factory(graph, id: serializedNode.id, attributes: attributes);
   }
 
   Edge deserializeEdge(Graph graph, EdgeProto serializedEdge) {

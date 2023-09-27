@@ -15,7 +15,7 @@ abstract class Node extends HasId {
   /// in serialization.
   String get typeName;
 
-  /// [id] must be unique to the graph this node belongs to. If it's not passed 
+  /// [id] must be unique to the graph this node belongs to. If it's not passed
   /// in, a uuid will be generated.
   Node(this.graph, {String? id}) : super(id) {
     createPorts(_inPorts, _outPorts);
@@ -24,6 +24,16 @@ abstract class Node extends HasId {
     outPorts = UnmodifiableMapView(_outPorts);
 
     graph.nodes[this.id] = this;
+  }
+
+  /// Get attributes of this node. Returns an empty map by default. Nodes needing
+  /// attribute serialization should impelment this, and deserializers should call
+  /// this to get potential serializable attributes.
+  /// 
+  /// For deserialization it should be handled by the factories, where attributes
+  /// are passed into.
+  Map<String, Uint8List> getAttributes() {
+    return {};
   }
 
   void createPorts(Map<String, InPort> inPorts, Map<String, OutPort> outPorts);

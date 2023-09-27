@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:computational_graph/computational_graph.dart';
 import 'package:computational_graph/src/serialization/protobuf/models/graph.pbserver.dart';
 import 'package:computational_graph/src/serialization/protobuf/protobuf_serializer.dart';
 import 'package:test/test.dart';
 
 import 'fixtures/simple_addition_graph.dart';
+import 'fixtures/simple_attribute_node.dart';
 
 void main() {
   group("Protobuf serialization tests", () {
@@ -58,6 +60,21 @@ void main() {
       expect(result, 15,
           reason:
               "Deserialized graph should compute the same as the original graph");
+    });
+
+    test("Attribute serialization test", () async {
+      Graph graph = Graph();
+      ProtobufSerializer serializer = ProtobufSerializer();
+      SimpleAttributeNode.registerFactoryTo(serializer.registry);
+      SimpleAttributeNode node = SimpleAttributeNode(graph);
+      node.someAttribute = "someValue";
+      GraphProto serialized = serializer.serializeGraph(graph);
+
+      Graph deserialized = serializer.deserializeGraph(serialized, null);
+      SimpleAttributeNode deserializedNode =
+          deserialized.nodes.entries.first.value as SimpleAttributeNode;
+
+      expect(deserializedNode.someAttribute, "someValue");
     });
   });
 }

@@ -6,9 +6,15 @@ message GraphProto {
   repeated EdgeProto edges = 3;
 }
 
+message AttributeEntry {
+  string key = 1;
+  bytes value = 2;
+}
+
 message NodeProto {
   string type = 1;
   string id = 2;
+  repeated AttributeEntry attributes = 3;
 }
 
 message EdgeProto {
