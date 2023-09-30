@@ -66,7 +66,7 @@ class OutPort<T> extends Port<T> {
   final Set<Edge<T>> _edges = {};
   late final UnmodifiableSetView<Edge<T>> edges;
   bool _isOpen = false;
-  
+
   @override
   bool get isOpen => _isOpen;
 
@@ -97,7 +97,7 @@ class OutPort<T> extends Port<T> {
     }
   }
 
-  bool connected() => _edges.isNotEmpty;
+  bool get connected => _edges.isNotEmpty;
 
   void _close() {
     _isOpen = false;
