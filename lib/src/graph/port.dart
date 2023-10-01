@@ -11,14 +11,15 @@ abstract class Port<DataType> {
 
   /// Name of the port. This should be unique within the same node.
   final String name;
-
   bool get isOpen;
+  bool get connected;
 
   Port({required this.node, required this.name});
 }
 
 class InPort<T> extends Port<T> {
   Edge<T>? _edge;
+  @override
   bool get connected => _edge != null;
   Edge<T>? get edge => _edge;
   StreamController<T>? _currentDataStream;
@@ -97,6 +98,7 @@ class OutPort<T> extends Port<T> {
     }
   }
 
+  @override
   bool get connected => _edges.isNotEmpty;
 
   void _close() {
