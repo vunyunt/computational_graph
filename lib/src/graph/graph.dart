@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:computational_graph/src/graph/has_id.dart';
+import './has_id.dart';
 import 'package:meta/meta.dart';
 
 part 'port.dart';

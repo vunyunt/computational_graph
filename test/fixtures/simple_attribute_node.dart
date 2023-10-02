@@ -15,8 +15,10 @@ class SimpleAttributeNode extends Node {
   }
 
   @override
-  void createPorts(
-      Map<String, InPort> inPorts, Map<String, OutPort> outPorts) {}
+  Iterable<InPort> createInPorts() => [];
+
+  @override
+  Iterable<OutPort> createOutPorts() => [];
 
   @override
   String get typeName => "SimpleAttributeNode";

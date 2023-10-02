@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:computational_graph/computational_graph.dart';
 import 'package:computational_graph/src/serialization/protobuf/models/graph.pbserver.dart';
-import 'package:computational_graph/src/serialization/protobuf/protobuf_serializer.dart';
 import 'package:test/test.dart';
 
 import 'fixtures/simple_addition_graph.dart';

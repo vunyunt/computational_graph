@@ -1,5 +1,4 @@
 import 'package:computational_graph/computational_graph.dart';
-import 'package:computational_graph/src/serialization/node_factory_registry.dart';
 
 /// A simple node that simply records the last received value
 class SimpleOutputNode extends Node {
@@ -20,7 +19,7 @@ class SimpleOutputNode extends Node {
   }
 
   @override
-  void createPorts(Map<String, InPort> inPorts, Map<String, OutPort> outPorts) {
+  Iterable<InPort> createInPorts() {
     input = InPort(
         node: this,
         name: "input",
@@ -30,8 +29,11 @@ class SimpleOutputNode extends Node {
               })
             });
 
-    inPorts[input.name] = input;
+    return [input];
   }
+
+  @override
+  Iterable<OutPort> createOutPorts() => [];
 }
 
 /// A simple node to accumulate all inputs.
@@ -58,8 +60,8 @@ class AccumulateNode extends Node {
   }
 
   @override
-  void createPorts(Map<String, InPort> inPorts, Map<String, OutPort> outPorts) {
-    a = InPort(
+  Iterable<InPort> createInPorts() {
+    a = InPort<int>(
         node: this,
         name: "a",
         onDataStreamAvailable: (stream) {
@@ -67,7 +69,7 @@ class AccumulateNode extends Node {
             total += val;
           }, onDone: onStreamClosed);
         });
-    b = InPort(
+    b = InPort<int>(
         node: this,
         name: "b",
         onDataStreamAvailable: (stream) {
@@ -75,13 +77,14 @@ class AccumulateNode extends Node {
             total += val;
           }, onDone: onStreamClosed);
         });
+
+    return [a, b];
+  }
+
+  @override
+  Iterable<OutPort> createOutPorts() {
     output = OutPort(node: this, name: "output");
-
-    inPorts[a.name] = a;
-    inPorts[b.name] = b;
-    outPorts[output.name] = output;
-
-    open(output);
+    return [output];
   }
 }
 
@@ -96,12 +99,11 @@ class SimpleInputNode extends Node {
   SimpleInputNode(super.graph, {super.id});
 
   @override
-  void createPorts(Map<String, InPort> inPorts, Map<String, OutPort> outPorts) {
+  Iterable<InPort> createInPorts() => [];
+  @override
+  Iterable<OutPort> createOutPorts() {
     output = OutPort(node: this, name: "output");
-
-    outPorts[output.name] = output;
-
-    open(output);
+    return [output];
   }
 
   void emit(int value) {

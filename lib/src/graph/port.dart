@@ -71,8 +71,13 @@ class OutPort<T> extends Port<T> {
   @override
   bool get isOpen => _isOpen;
 
-  OutPort({required super.node, required super.name}) {
+  /// Create an output port. Also opens this port if [open] is true (default)
+  OutPort({required super.node, required super.name, open = true}) {
     edges = UnmodifiableSetView(_edges);
+
+    if (open) {
+      this._open();
+    }
   }
 
   void _disconnect(Edge<T> edge) {
