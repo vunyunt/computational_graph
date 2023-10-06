@@ -9,10 +9,10 @@ part 'port.dart';
 part 'node.dart';
 part 'edge.dart';
 
-class Graph {
-  late final Map<String, Node> nodes;
+class Graph<NodeType extends Node> {
+  late final Map<String, NodeType> nodes;
 
-  Graph({Map<String, Node>? nodes}) {
+  Graph({Map<String, NodeType>? nodes}) {
     this.nodes = nodes ?? {};
   }
 }
