@@ -6,8 +6,8 @@ class PortStateError extends Error {
   PortStateError({this.message = ""});
 }
 
-abstract class Port<DataType> {
-  final Node node;
+abstract class Port<DataType, NodeType extends Node> {
+  final NodeType node;
 
   /// Name of the port. This should be unique within the same node.
   final String name;
@@ -17,13 +17,13 @@ abstract class Port<DataType> {
   Port({required this.node, required this.name});
 }
 
-class InPort<T> extends Port<T> {
-  Edge<T>? _edge;
+class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
+  Edge<DataType>? _edge;
   @override
   bool get connected => _edge != null;
-  Edge<T>? get edge => _edge;
-  StreamController<T>? _currentDataStream;
-  final Function(Stream<T>) onDataStreamAvailable;
+  Edge<DataType>? get edge => _edge;
+  StreamController<DataType>? _currentDataStream;
+  final Function(Stream<DataType>) onDataStreamAvailable;
 
   @override
   bool get isOpen =>
@@ -34,7 +34,7 @@ class InPort<T> extends Port<T> {
       required super.name,
       required this.onDataStreamAvailable});
 
-  void _connectTo(Edge<T> edge) {
+  void _connectTo<FromNodeType extends Node>(Edge<DataType> edge) {
     _edge = edge;
   }
 
@@ -42,7 +42,7 @@ class InPort<T> extends Port<T> {
     _edge = null;
   }
 
-  void _receive(T value) {
+  void _receive(DataType value) {
     if (_currentDataStream == null) {
       throw PortStateError(message: "A Closed InPort received a value.");
     }
@@ -63,9 +63,10 @@ class InPort<T> extends Port<T> {
   }
 }
 
-class OutPort<T> extends Port<T> {
-  final Set<Edge<T>> _edges = {};
-  late final UnmodifiableSetView<Edge<T>> edges;
+class OutPort<DataType, NodeType extends Node>
+    extends Port<DataType, NodeType> {
+  final Set<Edge<DataType>> _edges = {};
+  late final UnmodifiableSetView<Edge<DataType>> edges;
   bool _isOpen = false;
 
   @override
@@ -80,12 +81,13 @@ class OutPort<T> extends Port<T> {
     }
   }
 
-  void _disconnect(Edge<T> edge) {
+  void _disconnect(Edge<DataType> edge) {
     _edges.remove(edge);
   }
 
-  Edge<T> connectTo(InPort<T> other) {
-    var edge = Edge<T>._create(this, other);
+  Edge<DataType> connectTo<ToNodeType extends Node>(
+      InPort<DataType, ToNodeType> other) {
+    var edge = Edge<DataType>._create(this, other);
     edge.to._connectTo(edge);
 
     if (_isOpen) {
@@ -97,7 +99,7 @@ class OutPort<T> extends Port<T> {
     return edge;
   }
 
-  void _send(T value) {
+  void _send(DataType value) {
     for (var edge in _edges) {
       edge.to._receive(value);
     }

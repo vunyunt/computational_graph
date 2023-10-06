@@ -45,7 +45,8 @@ abstract class Node extends HasId {
   Iterable<OutPort> createOutPorts();
 
   @protected
-  void sendTo<T>(OutPort<T> port, T value) {
+  void sendTo<DataType, NodeType extends Node>(
+      OutPort<DataType, NodeType> port, DataType value) {
     if (!_outPorts.containsKey(port.name) || _outPorts[port.name] != port) {
       throw UnregisteredPortError();
     }
@@ -55,7 +56,7 @@ abstract class Node extends HasId {
 
   /// Open the given [OutPort], making it ready to receive it value.
   @protected
-  void open<T>(OutPort<T> port) {
+  void open<DataType, NodeType extends Node>(OutPort<DataType, NodeType> port) {
     if (!_outPorts.containsKey(port.name) || _outPorts[port.name] != port) {
       throw UnregisteredPortError();
     }
@@ -65,7 +66,8 @@ abstract class Node extends HasId {
 
   /// Close the given [OutPort], signalling receiving ends of the closure.
   @protected
-  void close<T>(OutPort<T> port) {
+  void close<DataType, NodeType extends Node>(
+      OutPort<DataType, NodeType> port) {
     if (!_outPorts.containsKey(port.name) || _outPorts[port.name] != port) {
       throw UnregisteredPortError();
     }

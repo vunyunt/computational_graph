@@ -8,7 +8,7 @@ class SimpleOutputNode extends Node {
 
   Function(int)? onValueReceived;
 
-  late InPort<int> input;
+  late InPort<int, SimpleOutputNode> input;
 
   SimpleOutputNode(super.graph, {super.id});
 
@@ -45,10 +45,10 @@ class AccumulateNode extends Node {
 
   int total = 0;
 
-  late InPort<int> a;
-  late InPort<int> b;
+  late InPort<int, AccumulateNode> a;
+  late InPort<int, AccumulateNode> b;
 
-  late OutPort<int> output;
+  late OutPort<int, AccumulateNode> output;
 
   AccumulateNode(super.graph, {super.id});
 
@@ -61,7 +61,7 @@ class AccumulateNode extends Node {
 
   @override
   Iterable<InPort> createInPorts() {
-    a = InPort<int>(
+    a = InPort(
         node: this,
         name: "a",
         onDataStreamAvailable: (stream) {
@@ -69,7 +69,7 @@ class AccumulateNode extends Node {
             total += val;
           }, onDone: onStreamClosed);
         });
-    b = InPort<int>(
+    b = InPort(
         node: this,
         name: "b",
         onDataStreamAvailable: (stream) {
@@ -94,7 +94,7 @@ class SimpleInputNode extends Node {
   @override
   String get typeName => name;
 
-  late OutPort<int> output;
+  late OutPort<int, SimpleInputNode> output;
 
   SimpleInputNode(super.graph, {super.id});
 
