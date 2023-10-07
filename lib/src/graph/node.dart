@@ -29,6 +29,8 @@ abstract class Node extends HasId {
     outPorts = UnmodifiableMapView(_outPorts);
 
     graph.nodes[this.id] = this;
+
+    portsCreated();
   }
 
   /// Get attributes of this node. Returns an empty map by default. Nodes needing
@@ -43,6 +45,10 @@ abstract class Node extends HasId {
 
   Iterable<InPort> createInPorts();
   Iterable<OutPort> createOutPorts();
+
+  /// Implementing class should override this if it needs to process ports after
+  /// they are created
+  void portsCreated() {}
 
   @protected
   void sendTo<DataType, NodeType extends Node>(
