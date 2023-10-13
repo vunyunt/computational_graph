@@ -12,6 +12,14 @@ part 'edge.dart';
 class Graph<NodeType extends Node> {
   late final Map<String, NodeType> nodes;
 
+  final StreamController<Edge> _onEdgeConnectedController =
+      StreamController.broadcast();
+  final StreamController<Edge> _onEdgeDisconnectedController =
+      StreamController.broadcast();
+
+  Stream<Edge> get onEdgeConnected => _onEdgeConnectedController.stream;
+  Stream<Edge> get onEdgeDisconnected => _onEdgeDisconnectedController.stream;
+
   Graph({Map<String, NodeType>? nodes}) {
     this.nodes = nodes ?? {};
   }

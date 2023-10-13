@@ -6,8 +6,16 @@ class Edge<DataType> {
 
   Edge._create(this.from, this.to);
 
+  /// Disconnect this edge
   void disconnect() {
+    // Notify nodes of the disconnection
     from._disconnect(this);
     to._disconnect();
+
+    // Send disconnected event
+    final disconnectedEventStream = from.node.graph._onEdgeDisconnectedController;
+    if(disconnectedEventStream.hasListener) {
+      disconnectedEventStream.add(this);
+    }
   }
 }

@@ -34,7 +34,14 @@ class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
       required super.name,
       required this.onDataStreamAvailable});
 
+  /// Connect to an edge. Intended to be called by [OutPort.connectTo]
   void _connectTo<FromNodeType extends Node>(Edge<DataType> edge) {
+    // Disconnect the current edge first, since InPort can only have one edge at
+    // a time.
+    if(_edge != null) {
+      _edge!.disconnect();
+    }
+
     _edge = edge;
   }
 
@@ -85,15 +92,27 @@ class OutPort<DataType, NodeType extends Node>
     _edges.remove(edge);
   }
 
+  /// Connect to the specified [InPort]. Currently edges can only be initiated
+  /// from [OutPort]s.
   Edge<DataType> connectTo<ToNodeType extends Node>(
       InPort<DataType, ToNodeType> other) {
+    // Create edge
     var edge = Edge<DataType>._create(this, other);
+
+    // Call connect on the other side
     edge.to._connectTo(edge);
 
+    // Open the InPort connected to this if this port is open
     if (_isOpen) {
       edge.to._open();
     }
 
+    // Send connected event
+    if(node.graph._onEdgeConnectedController.hasListener) {
+      node.graph._onEdgeConnectedController.add(edge);
+    }
+
+    // Record the connection
     _edges.add(edge);
 
     return edge;
