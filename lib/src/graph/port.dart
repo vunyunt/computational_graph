@@ -13,9 +13,6 @@ abstract class Port<DataType, NodeType extends Node> {
   final String name;
   bool get isOpen;
   bool get connected;
-  Type get dataType => DataType;
-
-  bool canConnectTo<T>(Port<T, Node> other);
 
   Port({required this.node, required this.name});
 }
@@ -31,11 +28,6 @@ class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
   @override
   bool get isOpen =>
       _currentDataStream != null && !_currentDataStream!.isClosed;
-
-  @override
-  bool canConnectTo<T>(Port<T, Node> other) {
-    return other is OutPort<DataType, Node>;
-  }
 
   InPort(
       {required super.node,
@@ -86,11 +78,6 @@ class OutPort<DataType, NodeType extends Node>
 
   @override
   bool get isOpen => _isOpen;
-
-  @override
-  bool canConnectTo<T>(Port<T, Node> other) {
-    return other is InPort<T, Node> && this is OutPort<T, Node>;
-  }
 
   /// Create an output port. Also opens this port if [open] is true (default)
   OutPort({required super.node, required super.name, open = true}) {
