@@ -13,6 +13,7 @@ abstract class Port<DataType, NodeType extends Node> {
   final String name;
   bool get isOpen;
   bool get connected;
+  Type get dataType => DataType;
 
   Port({required this.node, required this.name});
 }
