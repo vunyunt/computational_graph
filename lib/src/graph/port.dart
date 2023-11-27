@@ -6,6 +6,12 @@ class PortStateError extends Error {
   PortStateError({this.message = ""});
 }
 
+class PortTypeError extends Error {
+  String message;
+
+  PortTypeError({this.message = ""});
+}
+
 abstract class Port<DataType, NodeType extends Node> {
   final NodeType node;
 
@@ -18,10 +24,10 @@ abstract class Port<DataType, NodeType extends Node> {
 }
 
 class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
-  Edge<DataType>? _edge;
+  Edge? _edge;
   @override
   bool get connected => _edge != null;
-  Edge<DataType>? get edge => _edge;
+  Edge? get edge => _edge;
   StreamController<DataType>? _currentDataStream;
   final Function(Stream<DataType>) onDataStreamAvailable;
 
@@ -35,7 +41,7 @@ class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
       required this.onDataStreamAvailable});
 
   /// Connect to an edge. Intended to be called by [OutPort.connectTo]
-  void _connectTo<FromNodeType extends Node>(Edge<DataType> edge) {
+  void _connectTo(Edge edge) {
     // Disconnect the current edge first, since InPort can only have one edge at
     // a time.
     if (_edge != null) {
@@ -72,8 +78,8 @@ class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
 
 class OutPort<DataType, NodeType extends Node>
     extends Port<DataType, NodeType> {
-  final Set<Edge<DataType>> _edges = {};
-  late final UnmodifiableSetView<Edge<DataType>> edges;
+  final Set<Edge> _edges = {};
+  late final UnmodifiableSetView<Edge> edges;
   bool _isOpen = false;
 
   @override
@@ -88,20 +94,11 @@ class OutPort<DataType, NodeType extends Node>
     }
   }
 
-  void _disconnect(Edge<DataType> edge) {
+  void _disconnect(Edge edge) {
     _edges.remove(edge);
   }
 
-  /// Connect to the specified [InPort]. Currently edges can only be initiated
-  /// from [OutPort]s.
-  Edge<DataType> connectTo<ToNodeType extends Node>(
-      InPort<DataType, ToNodeType> other) {
-    // Create edge
-    var edge = Edge<DataType>._create(this, other);
-
-    // Call connect on the other side
-    edge.to._connectTo(edge);
-
+  void _connectTo(Edge edge) {
     // Open the InPort connected to this if this port is open
     if (_isOpen) {
       edge.to._open();
@@ -114,8 +111,6 @@ class OutPort<DataType, NodeType extends Node>
 
     // Record the connection
     _edges.add(edge);
-
-    return edge;
   }
 
   void _send(DataType value) {

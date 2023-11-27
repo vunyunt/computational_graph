@@ -127,9 +127,9 @@ class SimpleAdditionGraph extends Graph {
     nodes['addition'] = AccumulateNode(this, id: 'addition');
     nodes['output'] = SimpleOutputNode(this, id: 'output');
 
-    input1.output.connectTo(addition.a);
-    input2.output.connectTo(addition.b);
-    addition.output.connectTo(output.input);
+    Edge.connect(input1.output, addition.a);
+    Edge.connect(input2.output, addition.b);
+    Edge.connect(addition.output, output.input);
   }
 
   /// Create an empty instance of this graph. Intended for testing deserialization

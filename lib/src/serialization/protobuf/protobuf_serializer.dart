@@ -110,13 +110,13 @@ class ProtobufSerializer implements Serializer<GeneratedMessage> {
       throw UnknownNodeException();
     }
 
-    OutPort? fromPort = fromNode.outPorts[serializedEdge.fromPortName];
-    InPort? toPort = toNode.inPorts[serializedEdge.toPortName];
+    final fromPort = fromNode.outPorts[serializedEdge.fromPortName];
+    final toPort = toNode.inPorts[serializedEdge.toPortName];
 
     if (fromPort == null || toPort == null) {
       throw UnknownPortException();
     }
 
-    return fromPort.connectTo(toPort);
+    return Edge.connect(fromPort, toPort);
   }
 }

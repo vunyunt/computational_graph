@@ -38,7 +38,7 @@ void main() {
 
       graph.onEdgeConnected.listen(connectCallback);
 
-      input.output.connectTo(output.input);
+      Edge.connect(input.output, output.input);
     });
 
     test('Connection replacement disconnect event test,', () {
@@ -48,7 +48,7 @@ void main() {
       SimpleInputNode input2 = SimpleInputNode(graph, id: 'input2');
       SimpleOutputNode output = SimpleOutputNode(graph, id: 'output');
 
-      input1.output.connectTo(output.input);
+      Edge.connect(input1.output, output.input);
 
       final disconnectCallback = expectAsync1(
           (Edge edge) => expect(
@@ -59,7 +59,7 @@ void main() {
 
       graph.onEdgeDisconnected.listen(disconnectCallback);
 
-      input2.output.connectTo(output.input);
+      Edge.connect(input2.output, output.input);
     });
   });
 }
