@@ -40,6 +40,11 @@ class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
       required super.name,
       required this.onDataStreamAvailable});
 
+  Edge<FromDataType, DataType> connectFrom<FromDataType extends DataType>(
+      OutPort<FromDataType, Node> fromPort) {
+    return Edge<FromDataType, DataType>.connect(fromPort, this);
+  }
+
   /// Connect to an edge. Intended to be called by [OutPort.connectTo]
   void _connectTo(Edge edge) {
     // Disconnect the current edge first, since InPort can only have one edge at
