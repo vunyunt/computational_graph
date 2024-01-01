@@ -9,13 +9,16 @@ class Edge<FromDataType extends ToDataType, ToDataType> {
   /// A static method is used as a factory instead of an actual factory method
   /// This is to allow for generic type definition, which is used to ensure
   /// [FromDataType] can be converted to [ToDataType] in type analysis
+  ///
+  /// In addition, [from.exampleValue] is used to perform a test to ensure [to]
+  /// can actually accept the value type [FromDataType] as input during runtime
   factory Edge.connect(
       OutPort<FromDataType, Node> from, InPort<ToDataType, Node> to) {
     // Create edge
     final edge = Edge._(from, to);
 
     // Call connect on both sides
-    to._connectTo(edge);
+    to._connectTo(edge, from.exampleValue);
     from._connectTo(edge);
 
     return edge;

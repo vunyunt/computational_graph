@@ -45,8 +45,8 @@ class InPort<DataType, NodeType extends Node> extends Port<DataType, NodeType> {
     return Edge<FromDataType, DataType>.connect(fromPort, this);
   }
 
-  /// Connect to an edge. Intended to be called by [OutPort.connectTo]
-  void _connectTo(Edge edge) {
+  /// Connect to an edge. Intended to be called by [Edge.connect]
+  void _connectTo(Edge edge, DataType exampleValue) {
     // Disconnect the current edge first, since InPort can only have one edge at
     // a time.
     if (_edge != null) {
@@ -85,13 +85,20 @@ class OutPort<DataType, NodeType extends Node>
     extends Port<DataType, NodeType> {
   final Set<Edge> _edges = {};
   late final UnmodifiableSetView<Edge> edges;
+  final DataType exampleValue;
   bool _isOpen = false;
 
   @override
   bool get isOpen => _isOpen;
 
   /// Create an output port. Also opens this port if [open] is true (default)
-  OutPort({required super.node, required super.name, open = true}) {
+  /// [exampleValue] is the value used to determine type compatibility between
+  /// this port and the input port attempting to connect to it
+  OutPort(
+      {required super.node,
+      required super.name,
+      required this.exampleValue,
+      open = true}) {
     edges = UnmodifiableSetView(_edges);
 
     if (open) {
