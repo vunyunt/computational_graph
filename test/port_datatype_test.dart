@@ -21,16 +21,9 @@ class FromNode extends Node {
 
   @override
   Iterable<OutPort<dynamic, Node>> createOutPorts() {
-    superclassOutput = OutPort(
-        node: this,
-        name: "superclassOutput",
-        exampleValue: ExampleDataSuperclass());
-    dataClassOutput = OutPort(
-        node: this, name: "dataClassOutput", exampleValue: ExampleDataClass());
-    subclassOutput = OutPort(
-        node: this,
-        name: "subclassOutput",
-        exampleValue: ExampleDataSubclass());
+    superclassOutput = OutPort(node: this, name: "superclassOutput");
+    dataClassOutput = OutPort(node: this, name: "dataClassOutput");
+    subclassOutput = OutPort(node: this, name: "subclassOutput");
 
     return [superclassOutput, dataClassOutput, subclassOutput];
   }
@@ -70,7 +63,7 @@ void main() {
               fromNode.superclassOutput as dynamic,
               // ignore: unnecessary_cast
               toNode.input as InPort<dynamic, Node>),
-          throwsA(TypeMatcher<TypeError>()),
+          throwsA(TypeMatcher<PortTypeException>()),
           reason: "InPort should only accept subclasses as data");
       expect(() => Edge.connect(fromNode.dataClassOutput, toNode.input),
           returnsNormally,

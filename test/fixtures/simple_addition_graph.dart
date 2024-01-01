@@ -83,7 +83,7 @@ class AccumulateNode extends Node {
 
   @override
   Iterable<OutPort> createOutPorts() {
-    output = OutPort(node: this, name: "output", exampleValue: 1);
+    output = OutPort(node: this, name: "output");
     return [output];
   }
 }
@@ -102,7 +102,7 @@ class SimpleInputNode extends Node {
   Iterable<InPort> createInPorts() => [];
   @override
   Iterable<OutPort> createOutPorts() {
-    output = OutPort(node: this, name: "output", exampleValue: 1);
+    output = OutPort(node: this, name: "output");
     return [output];
   }
 
