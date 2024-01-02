@@ -18,6 +18,7 @@ class GraphProto extends $pb.GeneratedMessage {
     $core.int? serializerVersion,
     $core.Iterable<NodeProto>? nodes,
     $core.Iterable<EdgeProto>? edges,
+    $core.Iterable<AttributeEntry>? attributes,
   }) {
     final $result = create();
     if (serializerVersion != null) {
@@ -29,6 +30,9 @@ class GraphProto extends $pb.GeneratedMessage {
     if (edges != null) {
       $result.edges.addAll(edges);
     }
+    if (attributes != null) {
+      $result.attributes.addAll(attributes);
+    }
     return $result;
   }
   GraphProto._() : super();
@@ -39,6 +43,7 @@ class GraphProto extends $pb.GeneratedMessage {
     ..a<$core.int>(1, _omitFieldNames ? '' : 'serializerVersion', $pb.PbFieldType.O3, protoName: 'serializerVersion')
     ..pc<NodeProto>(2, _omitFieldNames ? '' : 'nodes', $pb.PbFieldType.PM, subBuilder: NodeProto.create)
     ..pc<EdgeProto>(3, _omitFieldNames ? '' : 'edges', $pb.PbFieldType.PM, subBuilder: EdgeProto.create)
+    ..pc<AttributeEntry>(4, _omitFieldNames ? '' : 'attributes', $pb.PbFieldType.PM, subBuilder: AttributeEntry.create)
     ..hasRequiredFields = false
   ;
 
@@ -77,6 +82,9 @@ class GraphProto extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(3)
   $core.List<EdgeProto> get edges => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<AttributeEntry> get attributes => $_getList(3);
 }
 
 class AttributeEntry extends $pb.GeneratedMessage {

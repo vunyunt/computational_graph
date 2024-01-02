@@ -4,6 +4,7 @@ message GraphProto {
   int32 serializerVersion = 1;
   repeated NodeProto nodes = 2;
   repeated EdgeProto edges = 3;
+  repeated AttributeEntry attributes = 4;
 }
 
 message AttributeEntry {

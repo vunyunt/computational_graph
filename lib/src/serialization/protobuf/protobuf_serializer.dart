@@ -56,7 +56,11 @@ class ProtobufSerializer implements Serializer<GeneratedMessage> {
       ..serializerVersion = version
       ..nodes.addAll(
           graph.nodes.entries.map((entry) => serializeNode(entry.value)))
-      ..edges.addAll(edges.map((edge) => serializeEdge(edge)));
+      ..edges.addAll(edges.map((edge) => serializeEdge(edge)))
+      ..attributes
+          .addAll(graph.getAttributes().entries.map((entry) => AttributeEntry()
+            ..key = entry.key
+            ..value = entry.value));
 
     return serialized;
   }
@@ -72,9 +76,16 @@ class ProtobufSerializer implements Serializer<GeneratedMessage> {
   }
 
   @override
-  Graph deserializeGraph(GeneratedMessage serializedGraph, Graph? graph) {
+  GraphType deserializeGraph<GraphType extends Graph>(
+      GeneratedMessage serializedGraph, GraphFactory<GraphType> graphFactory) {
     GraphProto graphProto = serializedGraph as GraphProto;
-    graph ??= Graph();
+
+    Map<String, Uint8List> graphAttributes = {};
+    for (final entry in graphProto.attributes) {
+      graphAttributes[entry.key] = Uint8List.fromList(entry.value);
+    }
+
+    GraphType graph = graphFactory(graphAttributes);
 
     for (final nodeProto in graphProto.nodes) {
       deserializeNode(graph, nodeProto);

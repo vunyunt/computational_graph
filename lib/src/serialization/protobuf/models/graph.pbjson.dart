@@ -20,6 +20,7 @@ const GraphProto$json = {
     {'1': 'serializerVersion', '3': 1, '4': 1, '5': 5, '10': 'serializerVersion'},
     {'1': 'nodes', '3': 2, '4': 3, '5': 11, '6': '.NodeProto', '10': 'nodes'},
     {'1': 'edges', '3': 3, '4': 3, '5': 11, '6': '.EdgeProto', '10': 'edges'},
+    {'1': 'attributes', '3': 4, '4': 3, '5': 11, '6': '.AttributeEntry', '10': 'attributes'},
   ],
 };
 
@@ -27,7 +28,8 @@ const GraphProto$json = {
 final $typed_data.Uint8List graphProtoDescriptor = $convert.base64Decode(
     'CgpHcmFwaFByb3RvEiwKEXNlcmlhbGl6ZXJWZXJzaW9uGAEgASgFUhFzZXJpYWxpemVyVmVyc2'
     'lvbhIgCgVub2RlcxgCIAMoCzIKLk5vZGVQcm90b1IFbm9kZXMSIAoFZWRnZXMYAyADKAsyCi5F'
-    'ZGdlUHJvdG9SBWVkZ2Vz');
+    'ZGdlUHJvdG9SBWVkZ2VzEi8KCmF0dHJpYnV0ZXMYBCADKAsyDy5BdHRyaWJ1dGVFbnRyeVIKYX'
+    'R0cmlidXRlcw==');
 
 @$core.Deprecated('Use attributeEntryDescriptor instead')
 const AttributeEntry$json = {

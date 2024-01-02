@@ -2,7 +2,7 @@ part of 'graph.dart';
 
 class UnregisteredPortError extends Error {}
 
-abstract class Node extends HasId {
+abstract class Node extends HasId with HasSerializableAttributes {
   final Graph graph;
 
   final Map<String, InPort> _inPorts = {};
@@ -31,16 +31,6 @@ abstract class Node extends HasId {
     graph.nodes[this.id] = this;
 
     portsCreated();
-  }
-
-  /// Get attributes of this node. Returns an empty map by default. Nodes needing
-  /// attribute serialization should impelment this, and deserializers should call
-  /// this to get potential serializable attributes.
-  ///
-  /// For deserialization it should be handled by the factories, where attributes
-  /// are passed into.
-  Map<String, Uint8List> getAttributes() {
-    return {};
   }
 
   Iterable<InPort> createInPorts();
