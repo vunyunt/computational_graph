@@ -20,7 +20,11 @@ class UnknownPortException implements Exception {}
 class ProtobufSerializer implements Serializer<GeneratedMessage> {
   static const version = 1;
 
-  final NodeFactoryRegistry<GeneratedMessage> registry = NodeFactoryRegistry();
+  late final NodeFactoryRegistry<GeneratedMessage> registry;
+
+  ProtobufSerializer({NodeFactoryRegistry<GeneratedMessage>? registry}) {
+    this.registry = registry ?? NodeFactoryRegistry<GeneratedMessage>();
+  }
 
   void registerFactoryFor(String nodeType, NodeFactory factory) {
     registry.registerFactoryFor(nodeType, factory);
