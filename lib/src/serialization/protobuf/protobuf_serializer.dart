@@ -79,6 +79,12 @@ class ProtobufSerializer implements Serializer<GeneratedMessage> {
           .map((e) => AttributeEntry(key: e.key, value: e.value)));
   }
 
+  GraphType deserializeGraphFromBytes<GraphType extends Graph>(
+      Uint8List serializedGraph, GraphFactory<GraphType> graphFactory) {
+    return deserializeGraph(
+        GraphProto.fromBuffer(serializedGraph), graphFactory);
+  }
+
   @override
   GraphType deserializeGraph<GraphType extends Graph>(
       GeneratedMessage serializedGraph, GraphFactory<GraphType> graphFactory) {

@@ -75,10 +75,12 @@ void main() {
       SimpleAdditionGraph graph = SimpleAdditionGraph();
       ProtobufSerializer serializer = ProtobufSerializer();
       GraphProto serialized = serializer.serializeGraph(graph);
+      Uint8List serializedBytes = serialized.writeToBuffer();
+
       SimpleAdditionGraph.registerFactoriesTo(serializer.registry);
 
-      SimpleAdditionGraph deserialized = serializer.deserializeGraph(
-          serialized, (_) => SimpleAdditionGraph.empty());
+      SimpleAdditionGraph deserialized = serializer.deserializeGraphFromBytes(
+          serializedBytes, (_) => SimpleAdditionGraph.empty());
 
       Completer<int> execution = Completer();
       deserialized.output.onValueReceived = (p0) => execution.complete(p0);
