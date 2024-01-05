@@ -1,7 +1,7 @@
 import 'package:uuid/v4.dart';
 
 abstract class HasId {
-  late final String _id;
+  late String _id;
 
   String get id => _id;
 
