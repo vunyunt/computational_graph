@@ -1,9 +1,15 @@
 import 'package:uuid/v4.dart';
 
 abstract class HasId {
-  late final String id;
+  late final String _id;
+
+  String get id => _id;
 
   HasId(String? id) {
-    this.id = id ?? UuidV4().generate();
+    _id = id ?? UuidV4().generate();
+  }
+
+  setId(String id) {
+    _id = id;
   }
 }
